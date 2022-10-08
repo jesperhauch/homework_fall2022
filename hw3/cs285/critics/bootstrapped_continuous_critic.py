@@ -95,8 +95,8 @@ class BootstrappedContinuousCritic(nn.Module, BaseCritic):
             v_sprime = self.forward(next_ob_no)
             targets = (reward_n + self.gamma*v_sprime*(1-terminal_n)).detach()
 
-          output = self.forward(ob_no)
-          loss = self.loss(output, targets)
+          v_s = self.forward(ob_no)
+          loss = self.loss(v_s, targets)
 
           self.optimizer.zero_grad()
           loss.backward()

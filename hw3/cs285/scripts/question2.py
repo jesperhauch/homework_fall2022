@@ -9,4 +9,4 @@ commands = ["python cs285/scripts/run_hw3_dqn.py --env_name LunarLander-v3 --exp
 if __name__ == "__main__":
     for command in commands:
         args = shlex.split(command)
-        subprocess.run(args)
+        subprocess.Popen(args)

@@ -1,0 +1,2 @@
+Question 3:
+- How to change learning rate or exploration schedule? Can't find where agent_params are set in code
