@@ -140,4 +140,4 @@ class MLPPolicyAC(MLPPolicy):
         loss.backward()
         self.optimizer.step()
       
-        return loss.item()
+        return loss

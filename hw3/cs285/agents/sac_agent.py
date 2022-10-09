@@ -1,10 +1,12 @@
 from collections import OrderedDict
+from symbol import term
 
 from cs285.critics.bootstrapped_continuous_critic import \
     BootstrappedContinuousCritic
 from cs285.infrastructure.replay_buffer import ReplayBuffer
 from cs285.infrastructure.utils import *
 from cs285.policies.MLP_policy import MLPPolicyAC
+from cs285.infrastructure.sac_utils import soft_update_params
 from .base_agent import BaseAgent
 import gym
 from cs285.policies.sac_policy import MLPPolicySAC
@@ -50,7 +52,21 @@ class SACAgent(BaseAgent):
         # 1. Compute the target Q value. 
         # HINT: You need to use the entropy term (alpha)
         # 2. Get current Q estimates and calculate critic loss
-        # 3. Optimize the critic  
+        # 3. Optimize the critic
+        ob_no = ptu.from_numpy(ob_no)
+        ac_na = ptu.from_numpy(ac_na)
+        next_ob_no = ptu.from_numpy(next_ob_no)
+        re_n = ptu.from_numpy(re_n)
+        terminal_n = ptu.from_numpy(terminal_n)
+        q_target = self.critic_target.forward(next_ob_no, ac_na)
+        targets = (re_n + self.gamma(1-terminal_n)*(q_target.min()-self.actor.alpha*self.actor.forward(next_ob_no).mean)).detach()
+
+        v_s = self.critic.forward(ob_no)
+        critic_loss = self.critic.loss(v_s, targets)
+
+        self.critic.optimizer.zero_grad()
+        critic_loss.backward()
+        self.critic.optimizer.step()
         return critic_loss
 
     def train(self, ob_no, ac_na, re_n, next_ob_no, terminal_n):
@@ -68,10 +84,13 @@ class SACAgent(BaseAgent):
 
         # 4. gather losses for logging
         loss = OrderedDict()
-        loss['Critic_Loss'] = TODO
-        loss['Actor_Loss'] = TODO
-        loss['Alpha_Loss'] = TODO
-        loss['Temperature'] = TODO
+        for step in  range(self.agent_params['num_critic_updates_per_agent_update']):
+            if step % self.agent_params['critic_target_update_frequency']:
+                soft_update_params(self.critic, self.critic_target, self.critic_tau)
+            loss['Critic_Loss'] = self.update_critic(ob_no, ac_na, next_ob_no, re_n, terminal_n)
+        
+        for _ in range(self.agent_params['num_actor_updates_per_agent_update']):
+            loss['Actor_Loss'], loss['Alpha_Loss'], loss['Temperature']  = self.actor.update(ob_no, self.critic)
 
         return loss
 

@@ -5,6 +5,7 @@ from cs285.infrastructure import sac_utils
 from cs285.infrastructure import pytorch_util as ptu
 from torch import nn
 from torch import optim
+from torch import distributions
 import itertools
 
 class MLPPolicySAC(MLPPolicy):
@@ -36,11 +37,18 @@ class MLPPolicySAC(MLPPolicy):
     @property
     def alpha(self):
         # TODO: Formulate entropy term
+        entropy = torch.exp(self.log_alpha)
         return entropy
 
     def get_action(self, obs: np.ndarray, sample=True) -> np.ndarray:
         # TODO: return sample from distribution if sampling
-        # if not sampling return the mean of the distribution 
+        # if not sampling return the mean of the distribution
+        obs = ptu.from_numpy(obs)
+        if sample:
+            action = self.forward(obs)
+        else:
+            action = self.forward(obs).mean()
+        action = ptu.to_numpy(action)
         return action
 
     # This function defines the forward pass of the network.
@@ -53,11 +61,40 @@ class MLPPolicySAC(MLPPolicy):
 
         # HINT: 
         # You will need to clip log values
-        # You will need SquashedNormal from sac_utils file 
+        # You will need SquashedNormal from sac_utils file
+        if self.discrete:
+          logits = self.logits_na(observation)
+          action_distribution = distributions.Categorical(logits=logits)
+        else:
+          mean = self.mean_net(observation)
+          log_std_min, log_std_max = self.log_std_bounds
+          logstd = torch.clamp(self.logstd, log_std_min, log_std_max) # clip log values
+          std = torch.exp(logstd)
+          action_distribution = sac_utils.SquashedNormal(mean, std) # use squashed normal
         return action_distribution
 
     def update(self, obs, critic):
         # TODO Update actor network and entropy regularizer
         # return losses and alpha value
+        obs = ptu.from_numpy(obs)
+
+        # Actor loss
+        action_distribution = self.forward(obs)
+        action = self.get_action(obs)
+        q_values = critic.forward(obs, action)
+        actor_loss = -(q_values.min() - self.alpha*action_distribution.log_prob(action))
+        actor_loss = actor_loss.mean()
+        
+        self.optimizer.zero_grad()
+        actor_loss.backward()
+        self.optimizer.step()
+
+        # Alpha loss
+        alpha_loss = -self.alpha*(action_distribution.log_prob(action) * self.target_entropy)
+        alpha_loss = alpha_loss.mean()
+
+        self.log_alpha_optimizer.zero_grad()
+        alpha_loss.backward()
+        self.log_alpha_optimizer.step()
 
         return actor_loss, alpha_loss, self.alpha
