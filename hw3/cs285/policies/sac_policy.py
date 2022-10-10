@@ -45,10 +45,13 @@ class MLPPolicySAC(MLPPolicy):
         # if not sampling return the mean of the distribution
         obs = ptu.from_numpy(obs)
         if sample:
-            action = self.forward(obs)
+            action = self.forward(obs).sample()
         else:
-            action = self.forward(obs).mean()
+            action = self.forward(obs).mean
+        action_min, action_max = self.action_range
+        action = torch.clamp(action, action_min, action_max)
         action = ptu.to_numpy(action)
+        #return action[None] # TODO: Why do we need to do this for the code to run?
         return action
 
     # This function defines the forward pass of the network.
@@ -62,27 +65,25 @@ class MLPPolicySAC(MLPPolicy):
         # HINT: 
         # You will need to clip log values
         # You will need SquashedNormal from sac_utils file
-        if self.discrete:
-          logits = self.logits_na(observation)
-          action_distribution = distributions.Categorical(logits=logits)
-        else:
-          mean = self.mean_net(observation)
-          log_std_min, log_std_max = self.log_std_bounds
-          logstd = torch.clamp(self.logstd, log_std_min, log_std_max) # clip log values
-          std = torch.exp(logstd)
-          action_distribution = sac_utils.SquashedNormal(mean, std) # use squashed normal
+        mean = self.mean_net(observation)
+        logstd = torch.tanh(self.logstd)
+        log_std_min, log_std_max = self.log_std_bounds
+        logstd = torch.clamp(logstd, log_std_min, log_std_max)
+        std = torch.exp(logstd)
+        action_distribution = sac_utils.SquashedNormal(mean, std)
         return action_distribution
 
     def update(self, obs, critic):
         # TODO Update actor network and entropy regularizer
         # return losses and alpha value
-        obs = ptu.from_numpy(obs)
 
         # Actor loss
+        obs = ptu.from_numpy(obs)
+
         action_distribution = self.forward(obs)
-        action = self.get_action(obs)
-        q_values = critic.forward(obs, action)
-        actor_loss = -(q_values.min() - self.alpha*action_distribution.log_prob(action))
+        action = action_distribution.rsample()
+        q_s = critic.forward(obs, action)
+        actor_loss = self.alpha * action_distribution.log_prob(action) - q_s.min() # TODO: Does this correspond to equation (7) from paper?
         actor_loss = actor_loss.mean()
         
         self.optimizer.zero_grad()
@@ -90,7 +91,7 @@ class MLPPolicySAC(MLPPolicy):
         self.optimizer.step()
 
         # Alpha loss
-        alpha_loss = -self.alpha*(action_distribution.log_prob(action) * self.target_entropy)
+        alpha_loss = -self.alpha*((action_distribution.log_prob(action)+self.target_entropy).detach()) # TODO: Does this match equation 17 in paper?
         alpha_loss = alpha_loss.mean()
 
         self.log_alpha_optimizer.zero_grad()

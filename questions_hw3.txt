@@ -2,6 +2,6 @@ Question 3:
 - How to change learning rate or exploration schedule? Can't find where agent_params are set in code
 
 Question 6:
-- How is alpha method defined? Simply exp(log_alpha)?
-- targets in update_critic (sac_agent)
-- forward and update method in sac_policy
+- Dimensions in critic_loss in update_critic does not match
+- What is being meant in the hints for train method in sac_agent?
+- How should we pass ntu and ngstpu for SAC?

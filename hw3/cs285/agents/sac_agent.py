@@ -58,11 +58,14 @@ class SACAgent(BaseAgent):
         next_ob_no = ptu.from_numpy(next_ob_no)
         re_n = ptu.from_numpy(re_n)
         terminal_n = ptu.from_numpy(terminal_n)
-        q_target = self.critic_target.forward(next_ob_no, ac_na)
-        targets = (re_n + self.gamma(1-terminal_n)*(q_target.min()-self.actor.alpha*self.actor.forward(next_ob_no).mean)).detach()
 
-        v_s = self.critic.forward(ob_no)
-        critic_loss = self.critic.loss(v_s, targets)
+        next_action_distribution = self.actor.forward(next_ob_no) # get log_pis(a_t+1|s_t+1)
+        next_actions = next_action_distribution.rsample()
+        q_target = self.critic_target.forward(next_ob_no, next_actions) # TODO: Should this be target network or not?
+        targets = re_n + self.gamma(1-terminal_n)*(q_target.min()-self.actor.alpha*next_action_distribution.log_prob(next_actions)) # Eq. 6
+
+        q_s = self.critic.forward(ob_no, ac_na)
+        critic_loss = self.critic.loss(q_s[0], targets) + self.critic.loss(q_s[1], targets) # TODO: dimension mismatch
 
         self.critic.optimizer.zero_grad()
         critic_loss.backward()
@@ -85,12 +88,13 @@ class SACAgent(BaseAgent):
         # 4. gather losses for logging
         loss = OrderedDict()
         for step in  range(self.agent_params['num_critic_updates_per_agent_update']):
-            if step % self.agent_params['critic_target_update_frequency']:
+            if step % self.agent_params['critic_target_update_frequency'] == 0:
                 soft_update_params(self.critic, self.critic_target, self.critic_tau)
             loss['Critic_Loss'] = self.update_critic(ob_no, ac_na, next_ob_no, re_n, terminal_n)
-        
-        for _ in range(self.agent_params['num_actor_updates_per_agent_update']):
-            loss['Actor_Loss'], loss['Alpha_Loss'], loss['Temperature']  = self.actor.update(ob_no, self.critic)
+            
+            if self.actor_update_frequency % step == 0: # TODO: Should this be inside for loop?
+                for step in range(self.agent_params['num_actor_updates_per_agent_update']):
+                    loss['Actor_Loss'], loss['Alpha_Loss'], loss['Temperature']  = self.actor.update(ob_no, self.critic)
 
         return loss
 
