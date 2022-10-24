@@ -123,6 +123,7 @@ class RL_Trainer(object):
                 self.logvideo = True
             else:
                 self.logvideo = False
+            self.log_video = self.logvideo
 
             # decide if metrics should be logged
             if self.params['scalar_log_freq'] == -1:
@@ -159,9 +160,34 @@ class RL_Trainer(object):
 
     def collect_training_trajectories(self, itr, load_initial_expertdata, collect_policy, batch_size):
         # TODO: GETTHIS from HW1
+        print("\nCollecting data to be used for training...")
+        paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, self.params['batch_size'], self.params['ep_len'])
+
+        train_video_paths = None
+        if self.log_video:
+            print('\nCollecting train rollouts to be used for saving videos...')
+            train_video_paths = utils.sample_n_trajectories(self.env, collect_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
+
+        return paths, envsteps_this_batch, train_video_paths
+
 
     def train_agent(self):
         # TODO: GETTHIS from HW1
+        print('\nTraining agent using sampled data from replay buffer...')
+        all_logs = []
+        for train_step in range(self.params['num_agent_train_steps_per_iter']):
+
+            # TODO sample some data from the data buffer
+            # HINT1: use the agent's sample function
+            # HINT2: how much data = self.params['train_batch_size']
+            ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch = self.agent.sample(self.params['train_batch_size'])
+
+            # TODO use the sampled data to train an agent
+            # HINT: use the agent's train function
+            # HINT: keep the agent's training log for debugging
+            train_log = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
+            all_logs.append(train_log) 
+        return all_logs
 
     ####################################
     ####################################
