@@ -59,7 +59,7 @@ class SACCritic(nn.Module, BaseCritic):
         obs_action_pair = torch.cat((obs, action), dim=1)
         q1 = self.Q1(obs_action_pair)
         q2 = self.Q2(obs_action_pair)
-        return torch.cat((q1, q2))
+        return torch.cat((q1, q2), dim=1)
 
 
 

@@ -51,8 +51,7 @@ class MLPPolicySAC(MLPPolicy):
         action_min, action_max = self.action_range
         action = torch.clamp(action, action_min, action_max)
         action = ptu.to_numpy(action)
-        #return action[None] # TODO: Why do we need to do this for the code to run?
-        return action
+        return action[None]
 
     # This function defines the forward pass of the network.
     # You can return anything you want, but you should be able to differentiate
@@ -66,7 +65,7 @@ class MLPPolicySAC(MLPPolicy):
         # You will need to clip log values
         # You will need SquashedNormal from sac_utils file
         mean = self.mean_net(observation)
-        logstd = torch.tanh(self.logstd)
+        logstd = torch.tanh(self.logstd) # TODO: Should we do this?
         log_std_min, log_std_max = self.log_std_bounds
         logstd = torch.clamp(logstd, log_std_min, log_std_max)
         std = torch.exp(logstd)
@@ -83,7 +82,9 @@ class MLPPolicySAC(MLPPolicy):
         action_distribution = self.forward(obs)
         action = action_distribution.rsample()
         q_s = critic.forward(obs, action)
-        actor_loss = self.alpha * action_distribution.log_prob(action) - q_s.min() # TODO: Does this correspond to equation (7) from paper?
+        q_min = torch.min(q_s, dim=1).values
+        log_pis = action_distribution.log_prob(action).sum(axis=1)
+        actor_loss = self.alpha * log_pis - q_min
         actor_loss = actor_loss.mean()
         
         self.optimizer.zero_grad()
@@ -91,11 +92,11 @@ class MLPPolicySAC(MLPPolicy):
         self.optimizer.step()
 
         # Alpha loss
-        alpha_loss = -self.alpha*((action_distribution.log_prob(action)+self.target_entropy).detach()) # TODO: Does this match equation 17 in paper?
+        alpha_loss = -self.alpha*(log_pis+self.target_entropy).detach()
         alpha_loss = alpha_loss.mean()
 
         self.log_alpha_optimizer.zero_grad()
         alpha_loss.backward()
         self.log_alpha_optimizer.step()
 
-        return actor_loss, alpha_loss, self.alpha
+        return actor_loss.item(), alpha_loss.item(), self.alpha

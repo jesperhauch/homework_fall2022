@@ -7,5 +7,4 @@ commands = ["python cs285/scripts/run_hw3_actor_critic.py --env_name CartPole-v0
 if __name__ == "__main__":
     for command in commands:
         args = shlex.split(command)
-        proc = subprocess.Popen(args)
-        proc.kill()
+        subprocess.Popen(args)
