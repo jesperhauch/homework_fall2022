@@ -55,8 +55,19 @@ class SACCritic(nn.Module, BaseCritic):
         )
 
     def forward(self, obs: torch.Tensor, action: torch.Tensor):
-        # TODO: get this from previous HW
-        return values
+        obs_action = torch.cat([obs, action], dim=-1)
+        q1 = self.Q1(obs_action)
+        q2 = self.Q2(obs_action)
+        return [q1, q2]
+
+    def forward_np(self, obs: np.ndarray, action: np.ndarray):
+        obs = ptu.from_numpy(obs) # TODO: IS this right?
+        action = ptu.from_numpy(action)
+        obs_action = torch.cat([obs, action], dim=-1)
+        q1 = self.Q1(obs_action)
+        q2 = self.Q2(obs_action)
+        predictions = torch.cat([q1,q2], dim=-1)
+        return ptu.to_numpy(predictions)
 
 
 
