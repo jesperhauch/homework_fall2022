@@ -57,8 +57,14 @@ class MPCPolicy(BasePolicy):
             # TODO(Q5): Implement action selection using CEM.
             # Begin with randomly selected actions, then refine the sampling distribution
             # iteratively as described in Section 3.3, "Iterative Random-Shooting with Refinement" of
-            # https://arxiv.org/pdf/1909.11652.pdf 
-            for i in range(self.cem_iterations):
+            # https://arxiv.org/pdf/1909.11652.pdf
+            action_sequences = np.random.uniform(self.low, self.high, size=(num_sequences, horizon, self.ac_dim))
+            a_rewards = self.evaluate_candidate_sequences(action_sequences, obs)
+            elite_ind = np.argpartition(a_rewards, -self.cem_num_elites)[-self.cem_num_elites:]
+            action_elites = action_sequences[elite_ind, :, :]
+            running_mean = np.mean(action_elites, axis=0)
+            running_std = np.std(action_elites, axis=0)
+            for i in range(self.cem_iterations-1):
                 # - Sample candidate sequences from a Gaussian with the current 
                 #   elite mean and variance
                 #     (Hint: remember that for the first iteration, we instead sample
@@ -67,10 +73,17 @@ class MPCPolicy(BasePolicy):
                 #     (Hint: what existing function can we use to compute rewards for
                 #      our candidate sequences in order to rank them?)
                 # - Update the elite mean and variance
-                pass
+                action_sequences = np.random.normal(running_mean, running_std, size=(num_sequences, horizon, self.ac_dim))
+                action_sequences = np.clip(action_sequences, self.low, self.high)
+                a_rewards = self.evaluate_candidate_sequences(action_sequences, obs)
+                elite_ind = np.argsort(a_rewards)[-self.cem_num_elites:]
+                action_elites = action_sequences[elite_ind, :, :]
+
+                running_mean = self.cem_alpha*np.mean(action_elites, axis=0) + (1-self.cem_alpha)*running_mean
+                running_std = self.cem_alpha*np.std(action_elites, axis=0) + (1-self.cem_alpha)*running_std
 
             # TODO(Q5): Set `cem_action` to the appropriate action chosen by CEM
-            cem_action = None
+            cem_action = running_mean
 
             return cem_action[None]
         else:
