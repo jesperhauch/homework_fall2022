@@ -60,10 +60,11 @@ class MPCPolicy(BasePolicy):
             # https://arxiv.org/pdf/1909.11652.pdf
             action_sequences = np.random.uniform(self.low, self.high, size=(num_sequences, horizon, self.ac_dim))
             a_rewards = self.evaluate_candidate_sequences(action_sequences, obs)
-            elite_ind = np.argpartition(a_rewards, -self.cem_num_elites)[-self.cem_num_elites:]
+            elite_ind = np.argsort(a_rewards)[-self.cem_num_elites:]
             action_elites = action_sequences[elite_ind, :, :]
             running_mean = np.mean(action_elites, axis=0)
             running_std = np.std(action_elites, axis=0)
+            
             for i in range(self.cem_iterations-1):
                 # - Sample candidate sequences from a Gaussian with the current 
                 #   elite mean and variance
