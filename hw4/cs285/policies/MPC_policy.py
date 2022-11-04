@@ -103,7 +103,7 @@ class MPCPolicy(BasePolicy):
             rewards = self.calculate_sum_of_rewards(obs, candidate_action_sequences, model)
             ensemble_rewards.append(rewards)
         ensemble_rewards = np.array(ensemble_rewards)
-        return ensemble_rewards.sum(axis=0)
+        return ensemble_rewards.mean(axis=0)
 
     def get_action(self, obs):
         if self.data_statistics is None:
