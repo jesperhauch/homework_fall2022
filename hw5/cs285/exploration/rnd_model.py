@@ -59,6 +59,7 @@ class RNDModel(nn.Module, BaseExplorationModel):
         ob_no = ptu.from_numpy(ob_no)
         error = self.forward(ob_no)
         loss = torch.mean(error)
+
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
