@@ -58,7 +58,7 @@ class CQLCritic(BaseCritic):
         # TODO compute targets for minimizing Bellman error
         # HINT: as you saw in lecture, this would be:
             #currentReward + self.gamma * qValuesOfNextTimestep * (not terminal)
-        target = reward_n + self.gamma*q_tp1*(1-terminal_n)
+        target = reward_n + self.gamma * q_tp1 * (1-terminal_n)
         target = target.detach()
 
         loss = self.loss(q_t_values, target)
@@ -96,8 +96,8 @@ class CQLCritic(BaseCritic):
         # TODO: Implement CQL as described in the pdf and paper
         # Hint: After calculating cql_loss, augment the loss appropriately
         q_t_logsumexp = torch.logsumexp(qa_t_values, dim=1)
-        cql_loss = self.cql_alpha*torch.mean(q_t_logsumexp-q_t_values)
-        loss = loss + cql_loss
+        cql_loss = self.cql_alpha * torch.mean(q_t_logsumexp-q_t_values)
+        loss += cql_loss
 
         self.optimizer.zero_grad
         loss.backward()

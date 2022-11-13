@@ -46,7 +46,7 @@ class RNDModel(nn.Module, BaseExplorationModel):
         # HINT: Remember to detach the output of self.f!
         target = self.f(ob_no).detach()
         pred = self.f_hat(ob_no)
-        return torch.linalg.norm(pred-target, dim=1) # CHECK: Correct norm?
+        return torch.linalg.norm(pred-target, dim=1)
 
     def forward_np(self, ob_no):
         ob_no = ptu.from_numpy(ob_no)
