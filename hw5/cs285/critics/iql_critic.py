@@ -61,7 +61,7 @@ class IQLCritic(BaseCritic):
         """
         Implement expectile loss on the difference between q and v
         """
-        pass
+        pass # torch.where() set to value if diff less than or equal to zero
 
     def update_v(self, ob_no, ac_na):
         """

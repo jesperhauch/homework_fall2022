@@ -63,22 +63,27 @@ class AWACAgent(DQNAgent):
         # HINT: store computed values in the provided vals list. You will use the average of this list for calculating the advantage.
         vals = []
         # TODO: get action distribution for current obs, you will use this for the value function estimate
-        dist = self.actor.critic.q_net(ob_no)
+        dist = self.eval_policy(ob_no)
         # TODO Calculate Value Function Estimate given current observation
         # HINT: You may find it helpful to utilze get_qvals defined above
         if self.agent_params['discrete']:
             for i in range(self.agent_params['ac_dim']):
-                pass
+                action = torch.ones(self.agent_params['batch_size'])*i
+                action = action.long()
+                val = self.get_qvals(self.exploitation_critic, ob_no, action) * torch.exp(dist.log_prob(action))
+                vals.append(val)
         else:
-            
             for _ in range(n_actions):
-                pass
-        v_pi = None
+                action = self.actor.get_action(ob_no)
+                val = self.get_qvals(self.exploitation_critic, ob_no, action)
+                vals.append(val)
+
+        v_pi = torch.stack(vals).mean(dim=0)
 
         # TODO Calculate Q-Values
-        q_vals = None
+        q_vals = self.get_qvals(self.exploitation_critic, ob_no, ac_na.long())
         # TODO Calculate the Advantage using q_vals and v_pi  
-        return None
+        return q_vals - v_pi
 
     def train(self, ob_no, ac_na, re_n, next_ob_no, terminal_n):
         log = {}
