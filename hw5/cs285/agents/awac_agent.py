@@ -68,14 +68,14 @@ class AWACAgent(DQNAgent):
         # HINT: You may find it helpful to utilze get_qvals defined above
         if self.agent_params['discrete']:
             for i in range(self.agent_params['ac_dim']):
-                action = torch.ones(self.agent_params['batch_size'])*i
-                action = action.long()
-                val = self.get_qvals(self.exploitation_critic, ob_no, action) * torch.exp(dist.log_prob(action))
+                actions = torch.ones(self.agent_params['batch_size'])*i
+                actions = actions.long()
+                val = self.get_qvals(self.exploitation_critic, ob_no, actions) * torch.exp(dist.log_prob(actions))
                 vals.append(val)
         else:
             for _ in range(n_actions):
-                action = self.actor.get_action(ob_no)
-                val = self.get_qvals(self.exploitation_critic, ob_no, action)
+                actions = self.actor.get_action(ob_no)
+                val = self.get_qvals(self.exploitation_critic, ob_no, actions)
                 vals.append(val)
 
         v_pi = torch.stack(vals).mean(dim=0)

@@ -41,19 +41,19 @@ python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 --exp_name q2
 ### Second sub-part
 Does shift and scale work better for CQL? If so, use in CQL runs below.
 ```
-python cs285/scripts/run_hw5_expl.py --env_name PointMassMedium-v0 --use_rnd \
+python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 --use_rnd \
 --num_exploration_steps 5000 --offline_exploitation --cql_alpha 0.1 \
 --unsupervised_exploration --exp_name q2_cql_numsteps_5000
 
-python cs285/scripts/run_hw5_expl.py --env_name PointMassMedium-v0 --use_rnd \
+python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 --use_rnd \
 --num_exploration_steps 15000 --offline_exploitation --cql_alpha 0.1 \
 --unsupervised_exploration --exp_name q2_cql_numsteps_15000
 
-python cs285/scripts/run_hw5_expl.py --env_name PointMassMedium --use_rnd \
+python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 --use_rnd \
 --num_exploration_steps 5000 --offline_exploitation --cql_alpha 0.0 \
 --unsupervised_exploration --exp_name q2_dqn_numsteps_5000
 
-python cs285/scripts/run_hw5_expl.py --env_name PointMassMedium --use_rnd \
+python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 --use_rnd \
 --num_exploration_steps 15000 --offline_exploitation --cql_alpha 0.0 \
 --unsupervised_exploration --exp_name q2_dqn_numsteps_15000
 ```
@@ -87,4 +87,118 @@ python cs285/scripts/run_hw5_expl.py --env_name PointmassHard-v0 --use_rnd \
 ```
 
 ## Part 4: Offline Learning with AWAC
+Different lambdas using unsupervised exporation on PointmassEasy.
+```
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 \
+--exp_name q4_awac_easy_unsupervised_lam0.1 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=0.1
 
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 \
+--exp_name q4_awac_easy_unsupervised_lam1 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 \
+--exp_name q4_awac_easy_unsupervised_lam2 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=2
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 \
+--exp_name q4_awac_easy_unsupervised_lam10 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=10
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 \
+--exp_name q4_awac_easy_unsupervised_lam20 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=20
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 \
+--exp_name q4_awac_easy_unsupervised_lam50 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=50
+```
+Different lambdas without unsupervised exploration on PointmassEasy
+```
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=0.1
+--exp_name q4_awac_easy_supervised_lam0.1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=1
+--exp_name q4_awac_easy_supervised_lam1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=2
+--exp_name q4_awac_easy_supervised_lam2
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=10
+--exp_name q4_awac_easy_supervised_lam10
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=20
+--exp_name q4_awac_easy_supervised_lam20
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassEasy-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=50
+--exp_name q4_awac_easy_supervised_lam50
+```
+
+Different lambdas using unsupervised exporation on PointmassMedium.
+```
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 \
+--exp_name q4_awac_medium_unsupervised_lam0.1 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=0.1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 \
+--exp_name q4_awac_medium_unsupervised_lam1 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 \
+--exp_name q4_awac_medium_unsupervised_lam2 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=2
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 \
+--exp_name q4_awac_medium_unsupervised_lam10 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=10
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 \
+--exp_name q4_awac_medium_unsupervised_lam20 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=20
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 \
+--exp_name q4_awac_medium_unsupervised_lam50 --use_rnd --num_exploration_steps=20000 \
+--unsupervised_exploration --awac_lambda=50
+```
+Different lambdas without unsupervised exploration on PointmassMedium
+```
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=0.1
+--exp_name q4_awac_medium_supervised_lam0.1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=1
+--exp_name q4_awac_medium_supervised_lam1
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=2
+--exp_name q4_awac_medium_supervised_lam2
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=10
+--exp_name q4_awac_medium_supervised_lam10
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=20
+--exp_name q4_awac_medium_supervised_lam20
+
+python cs285/scripts/run_hw5_awac.py --env_name PointmassMedium-v0 --use_rnd \
+--num_exploration_steps=20000 --awac_lambda=50
+--exp_name q4_awac_medium_supervised_lam50
+```
+
+## Part 5: Offline Learning with IQL
+
+```
+python cs285/scripts/run_hw5_iql.py --env_name PointmassEasy-v0 \
+--exp_name q5_iql_easy_supervised_lam{}_tau{} --use_rnd \
+--num_exploration_steps=20000 \
+--awac_lambda={best lambda part 4} \
+--iql_expectile={0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99}
+```
