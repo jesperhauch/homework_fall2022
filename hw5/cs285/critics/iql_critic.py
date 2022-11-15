@@ -47,7 +47,8 @@ class IQLCritic(BaseCritic):
         ### YOUR CODE HERE ###
         network_initializer = hparams['v_func']
         self.v_net = network_initializer(self.ob_dim)
-
+        self.v_net.to(ptu.device)
+        
         self.v_optimizer = self.optimizer_spec.constructor(
             self.v_net.parameters(),
             **self.optimizer_spec.optim_kwargs
