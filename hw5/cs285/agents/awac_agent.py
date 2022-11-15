@@ -69,7 +69,7 @@ class AWACAgent(DQNAgent):
         if self.agent_params['discrete']:
             for i in range(self.agent_params['ac_dim']):
                 actions = torch.ones(self.agent_params['batch_size'])*i
-                actions = actions.long()
+                actions = actions.long().to(ptu.device)
                 val = self.get_qvals(self.exploitation_critic, ob_no, actions) * torch.exp(dist.log_prob(actions))
                 vals.append(val)
         else:
