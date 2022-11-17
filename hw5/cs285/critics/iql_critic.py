@@ -99,7 +99,8 @@ class IQLCritic(BaseCritic):
         
         ### YOUR CODE HERE ###
         q_vals = torch.gather(self.q_net(ob_no), 1, ac_na.unsqueeze(1))
-        loss = torch.mean((reward_n + self.gamma*self.v_net(next_ob_no).detach()-q_vals)**2)
+        targets = reward_n + self.gamma*self.v_net(next_ob_no)
+        loss = torch.mean((targets.detach() - q_vals)**2)
 
         assert loss.shape == ()
         self.optimizer.zero_grad()
