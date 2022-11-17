@@ -45,8 +45,7 @@ class IQLCritic(BaseCritic):
         # TODO define value function
         # HINT: see Q_net definition above and optimizer below
         ### YOUR CODE HERE ###
-        network_initializer = hparams['v_func']
-        self.v_net = network_initializer(self.ob_dim)
+        self.v_net = network_initializer(self.ob_dim, 1)
         self.v_net.to(ptu.device)
         
         self.v_optimizer = self.optimizer_spec.constructor(
