@@ -110,10 +110,8 @@ class IQLAgent(DQNAgent):
             # 3): b) Update the exploitation critic's Q function (based off env_reward)
             expl_model_loss = self.exploration_model.update(next_ob_no)
             exploration_critic_loss = self.exploration_critic.update(ob_no, ac_na, next_ob_no, mixed_reward, terminal_n)
-            exploitation_critic_loss = self.exploitation_critic.update(ob_no, ac_na, next_ob_no, env_reward, terminal_n)
-            # CHECK: Virker de to nedenstående?
-            exploitation_critic_loss.update_v(ob_no, ac_na)
-            exploitation_critic_loss.update_q(ob_no, ac_na, next_ob_no, env_reward, terminal_n)
+            exploitation_critic_loss = self.exploitation_critic.update_v(ob_no, ac_na)
+            exploitation_critic_loss.update(self.exploitation_critic_loss.update_q(ob_no, ac_na, next_ob_no, env_reward, terminal_n))
 
             # TODO: update actor as in AWAC
             # 1): Estimate the advantage
