@@ -127,8 +127,8 @@ class IQLAgent(DQNAgent):
 
             # Logging #
             log['Exploration Critic Loss'] = exploration_critic_loss['Training Loss']
-            log['Exploitation Critic V Loss'] = exploitation_critic_loss['Training Q Loss']
-            log['Exploitation Critic Q Loss'] = exploitation_critic_loss['Training V Loss']
+            log['Exploitation Critic V Loss'] = exploitation_critic_loss['Training V Loss']
+            log['Exploitation Critic Q Loss'] = exploitation_critic_loss['Training Q Loss']
             log['Exploration Model Loss'] = expl_model_loss
 
             # <DONE>: Uncomment these lines after completing awac
