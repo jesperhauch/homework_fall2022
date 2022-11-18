@@ -16,11 +16,11 @@ python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 \
 
 ### Second sub-part
 ```
-python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0
---unsupervised_exploration <add arguments for your method> --exp_name q1_alg_med
+python cs285/scripts/run_hw5_expl.py --env_name PointmassEasy-v0 \
+--unsupervised_exploration --use_boltzmann --exp_name q1_alg_easy
 
-python cs285/scripts/run_hw5_expl.py --env_name PointmassHard-v0
---unsupervised_exploration <add arguments for your method> --exp_name q1_alg_hard
+python cs285/scripts/run_hw5_expl.py --env_name PointmassMedium-v0 \
+--unsupervised_exploration --use_boltzmann --exp_name q1_alg_med
 ```
 
 ## Part 2: Offline learning on exploration data
