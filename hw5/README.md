@@ -196,3 +196,8 @@ python cs285/scripts/run_hw5_iql.py --env_name PointmassEasy-v0 \
 --awac_lambda=0.1 \
 --iql_expectile=0.5
 ```
+
+## Submitting
+```
+zip -vr submit.zip . -x "*.png"
+```
